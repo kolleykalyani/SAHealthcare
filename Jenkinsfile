@@ -28,6 +28,7 @@ pipeline{
                 sh 'mvn package'
             }
         }
+         
         stage('run dockerfile'){
           steps{
                sh 'docker build -t myimg1 .'
