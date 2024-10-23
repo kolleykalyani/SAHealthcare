@@ -5,8 +5,8 @@ pipeline {
         DOCKER_IMAGE = 'myimg1'
         PORT = '8082'
         // Set environment variables for AWS credentials
-        AWS_ACCESS_KEY_ID = credentials('aws_access_key_id') // Replace with your Jenkins credential ID
-        AWS_SECRET_ACCESS_KEY = credentials('aws_secret_access_key') // Replace with your Jenkins credential ID
+        AWS_ACCESS_KEY_ID = credentials('AKIA6GBMA5CYJBQLVH4S') // Replace with your Jenkins credential ID
+        AWS_SECRET_ACCESS_KEY = credentials('vHybRLK/UXWpTbHNriaGZyp/bnRDbkLxpuBqUfCa') // Replace with your Jenkins credential ID
         KUBECONFIG_CRED = credentials('kubeconfig') // Jenkins credential ID for kubeconfig file
     }
     
