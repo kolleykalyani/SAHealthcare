@@ -79,10 +79,10 @@ pipeline {
                 }
             }
         }
-
-        stage('Terraform Apply') {
+    
+        stage('Terraform Apply (Kubernetes Cluster)') {
             steps {
-                // Apply the Terraform configuration
+                // Apply the Terraform configuration to create a Kubernetes cluster
                 dir('./terraform') {
                     sh 'terraform apply -auto-approve'
                 }
