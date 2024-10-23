@@ -4,12 +4,17 @@ pipeline {
     environment {
         DOCKER_IMAGE = 'myimg1'
         PORT = '8082'
+        // Set environment variables for AWS credentials
+        AWS_ACCESS_KEY_ID = credentials('aws_access_key_id') // Replace with your Jenkins credential ID
+        AWS_SECRET_ACCESS_KEY = credentials('aws_secret_access_key') // Replace with your Jenkins credential ID
+        KUBECONFIG_CRED = credentials('kubeconfig') // Jenkins credential ID for kubeconfig file
     }
     
     stages {
-        stage('Checkout the code from GitHub') {
+        stage('Checkout Code') {
             steps {
-                git url: 'https://github.com/kolleykalyani/SAhealthcare/'
+                // Checkout the code from GitHub
+                git url: 'https://github.com/kolleykalyani/SAhealthcare/', branch: 'main'
                 echo 'Checked out code from GitHub'
             }
         }
@@ -55,34 +60,6 @@ pipeline {
                 sh "docker run -dt -p ${PORT}:${PORT} --name c001 ${DOCKER_IMAGE}"
             }
         }
-    }
-    
-    post {
-        success {
-            echo 'Pipeline completed successfully!'
-        }
-        failure {
-            echo 'Pipeline failed.'
-        }
-    }
-}
-pipeline {
-    agent any
-
-    environment {
-        // Set environment variables for AWS credentials
-        AWS_ACCESS_KEY_ID = credentials('AKIA6GBMA5CYGX7B6QW5') 
-        AWS_SECRET_ACCESS_KEY = credentials('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') 
-    }
-
-    stages {
-        stage('Checkout Code') {
-            steps {
-                // Checkout the code from GitHub
-                git url: 'https://github.com/kolleykalyani/SAhealthcare/', branch: 'main'
-                echo 'Checked out code from GitHub'
-            }
-        }
 
         stage('Set Up Terraform') {
             steps {
@@ -97,42 +74,18 @@ pipeline {
         stage('Terraform Init') {
             steps {
                 // Initialize Terraform
-                sh 'terraform init'
-                workingDirectory: './terraform' // Adjust to your Terraform directory
+                dir('./terraform') {
+                    sh 'terraform init'
+                }
             }
         }
 
         stage('Terraform Apply') {
             steps {
                 // Apply the Terraform configuration
-                sh 'terraform apply -auto-approve'
-                workingDirectory: './terraform' // Adjust to your Terraform directory
-            }
-        }
-    }
-
-    post {
-        success {
-            echo 'Terraform apply completed successfully!'
-        }
-        failure {
-            echo 'Terraform apply failed.'
-        }
-    }
-}
-
-pipeline {
-    agent any
-    
-    environment {
-        KUBECONFIG_CRED = credentials('kubeconfig') // Jenkins credential ID for kubeconfig file
-    }
-    
-    stages {
-        stage('Checkout') {
-            steps {
-                git url: 'https://github.com/kolleykalyani/SAhealthcare/', branch: 'master'
-                echo 'Checked out the repository'
+                dir('./terraform') {
+                    sh 'terraform apply -auto-approve'
+                }
             }
         }
 
@@ -155,11 +108,10 @@ pipeline {
 
     post {
         success {
-            echo 'Deployment succeeded!'
+            echo 'Pipeline completed successfully!'
         }
         failure {
-            echo 'Deployment failed.'
+            echo 'Pipeline failed.'
         }
     }
 }
-
