@@ -1,5 +1,5 @@
 apiVersion: apps/v1
-kind: Deployment # Kubernetes resource kind we are creating
+kind: Deployment
 metadata:
   name: capstone-app-deployment
   labels:
@@ -8,7 +8,7 @@ spec:
   selector:
     matchLabels:
       app: healthcare
-  replicas: 2 # Number of replicas that will be created for this deployment
+  replicas: 2
   template:
     metadata:
       labels:
@@ -16,23 +16,34 @@ spec:
     spec:
       containers:
         - name: capstone-app-container
-          image: kalyanikolley/endtoendproject31july:v1 # Image that will be used to containers in the cluster
+          image: kalyanikolley/endtoendproject31july:v1
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 8082 # The port that the container is running on in the cluster
-
+            - containerPort: 8082
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8082
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8082
+            initialDelaySeconds: 30
+            periodSeconds: 10
 
 ---
 
-apiVersion: v1 # Kubernetes API version
-kind: Service # Kubernetes resource kind we are creating
-metadata: # Metadata of the resource kind we are creating
+apiVersion: v1
+kind: Service
+metadata:
   name: healthcare-app-service
 spec:
   selector:
     app: healthcare
   ports:
     - protocol: "TCP"
-      port: 8082 # The port that the service is running on in the cluster
-      targetPort: 8082 # The port exposed by the service
-  type: NodePort # type of the service.
+      port: 8082
+      targetPort: 8082
+  type: NodePort # Change to LoadBalancer if needed
