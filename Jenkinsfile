@@ -76,7 +76,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git url: 'https://github.com/kolleykalyani/health-care-project/', branch: 'main'
+                git url: 'https://github.com/kolleykalyani/health-care-project/', branch: 'master'
                 echo 'Checked out the repository'
             }
         }
