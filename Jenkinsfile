@@ -66,3 +66,45 @@ pipeline {
         }
     }
 }
+pipeline {
+    agent any
+    
+    environment {
+        KUBECONFIG_CRED = credentials('kubeconfig') // Jenkins credential ID for kubeconfig file
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                git url: 'https://github.com/kolleykalyani/health-care-project/', branch: 'main'
+                echo 'Checked out the repository'
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                script {
+                    // Write kubeconfig to the agent's file system
+                    writeFile file: 'kubeconfig', text: KUBECONFIG_CRED
+                    sh 'export KUBECONFIG=kubeconfig'
+
+                    // Apply the Kubernetes YAMLs
+                    sh 'kubectl apply -f deployment-service.yaml'
+
+                    // Clean up kubeconfig from the file system
+                    sh 'rm -f kubeconfig'
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Deployment succeeded!'
+        }
+        failure {
+            echo 'Deployment failed.'
+        }
+    }
+}
+
